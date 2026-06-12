@@ -207,8 +207,9 @@ export function GraphCanvas() {
               onConnect={onConnect}
               onSelectionChange={onSelectionChange}
               onNodesDelete={() => setSelectedNodeId(null)}
-              fitView
-              fitViewOptions={{ padding: 0.1 }}
+              defaultViewport={{ x: 10, y: 40, zoom: 0.35 }}
+              minZoom={0.35}
+              maxZoom={1.5}
               deleteKeyCode={['Backspace', 'Delete']}
               proOptions={{ hideAttribution: true }}
               className="dark-canvas-flow"
