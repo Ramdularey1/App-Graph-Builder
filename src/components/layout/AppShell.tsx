@@ -109,7 +109,7 @@ export function AppShell() {
         <main className="min-h-screen">
           <GraphCanvas />
         </main>
-        <div className="fixed left-7 top-20 z-20 hidden h-[330px] w-[324px] rounded-lg border border-[#141414] bg-black shadow-2xl md:block">
+        <div className="fixed left-[92px] top-[72px] z-20 h-[330px] w-[324px] rounded-lg border border-[#141414] bg-black shadow-2xl">
           <div className="p-5">
             <div className="mb-5 text-lg font-semibold">Application</div>
             <div className="mb-3 flex gap-2">
@@ -226,7 +226,7 @@ function LeftRail() {
   ];
 
   return (
-    <nav className="fixed bottom-20 left-1/2 z-30 flex -translate-x-1/2 flex-row items-center gap-2 rounded-lg bg-black p-2 shadow-2xl lg:left-5 lg:top-[310px] lg:bottom-auto lg:w-11 lg:translate-x-0 lg:flex-col">
+    <nav className="fixed left-5 top-[312px] z-30 flex w-11 flex-col items-center gap-2 rounded-lg bg-black p-2 shadow-2xl">
       {items.map(({ icon: Icon, color, label, action }, index) => (
         <button
           className={cn(
