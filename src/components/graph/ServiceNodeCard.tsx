@@ -24,7 +24,7 @@ export function ServiceNodeCard({ data, selected }: NodeProps<ServiceNode>) {
       )}
     >
       <Handle
-        className="!h-2 !w-2 !border-0 !bg-transparent"
+        className="!h-3 !w-3 !border-2 !border-black !bg-emerald-400 !opacity-100"
         position={Position.Left}
         type="target"
       />
@@ -108,7 +108,7 @@ export function ServiceNodeCard({ data, selected }: NodeProps<ServiceNode>) {
         </div>
       </div>
       <Handle
-        className="!h-2 !w-2 !border-0 !bg-transparent"
+        className="!h-3 !w-3 !border-2 !border-black !bg-blue-400 !opacity-100"
         position={Position.Right}
         type="source"
       />

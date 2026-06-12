@@ -19,6 +19,18 @@ const apps: AppSummary[] = [
     environment: 'Sandbox',
     owner: 'Data',
   },
+  {
+    id: 'ruby',
+    name: 'supertokens-ruby',
+    environment: 'Preview',
+    owner: 'Integrations',
+  },
+  {
+    id: 'go',
+    name: 'supertokens-go',
+    environment: 'Production',
+    owner: 'Core',
+  },
 ];
 
 const graphs: Record<string, AppGraph> = {
@@ -165,6 +177,120 @@ const graphs: Record<string, AppGraph> = {
     edges: [
       { id: 'ingest-stream', source: 'ingest', target: 'stream' },
       { id: 'stream-warehouse', source: 'stream', target: 'warehouse' },
+    ],
+  },
+  ruby: {
+    nodes: [
+      {
+        id: 'ruby-api',
+        type: 'service',
+        position: { x: 420, y: 150 },
+        data: {
+          label: 'Ruby API',
+          description: 'Handles session verification for Ruby services.',
+          status: 'Healthy',
+          traffic: 61,
+          kind: 'service',
+        },
+      },
+      {
+        id: 'ruby-postgres',
+        type: 'service',
+        position: { x: 790, y: 210 },
+        data: {
+          label: 'Postgres',
+          description: 'Stores tenant and user records.',
+          status: 'Healthy',
+          traffic: 53,
+          kind: 'database',
+        },
+      },
+      {
+        id: 'ruby-cache',
+        type: 'service',
+        position: { x: 360, y: 485 },
+        data: {
+          label: 'Redis',
+          description: 'Caches session recipe state.',
+          status: 'Degraded',
+          traffic: 38,
+          kind: 'database',
+        },
+      },
+      {
+        id: 'ruby-worker',
+        type: 'service',
+        position: { x: 835, y: 530 },
+        data: {
+          label: 'Worker',
+          description: 'Processes email delivery and cleanup jobs.',
+          status: 'Healthy',
+          traffic: 69,
+          kind: 'service',
+        },
+      },
+    ],
+    edges: [
+      { id: 'ruby-api-postgres', source: 'ruby-api', target: 'ruby-postgres' },
+      { id: 'ruby-api-cache', source: 'ruby-api', target: 'ruby-cache' },
+      { id: 'ruby-postgres-worker', source: 'ruby-postgres', target: 'ruby-worker' },
+    ],
+  },
+  go: {
+    nodes: [
+      {
+        id: 'go-gateway',
+        type: 'service',
+        position: { x: 420, y: 160 },
+        data: {
+          label: 'Go Gateway',
+          description: 'Terminates auth requests for Go backends.',
+          status: 'Healthy',
+          traffic: 82,
+          kind: 'service',
+        },
+      },
+      {
+        id: 'go-postgres',
+        type: 'service',
+        position: { x: 785, y: 210 },
+        data: {
+          label: 'Postgres',
+          description: 'Primary auth metadata store.',
+          status: 'Healthy',
+          traffic: 57,
+          kind: 'database',
+        },
+      },
+      {
+        id: 'go-redis',
+        type: 'service',
+        position: { x: 350, y: 480 },
+        data: {
+          label: 'Redis',
+          description: 'Rate limit and session cache.',
+          status: 'Healthy',
+          traffic: 47,
+          kind: 'database',
+        },
+      },
+      {
+        id: 'go-mongo',
+        type: 'service',
+        position: { x: 835, y: 530 },
+        data: {
+          label: 'Mongodb',
+          description: 'Audit document storage.',
+          status: 'Down',
+          traffic: 64,
+          kind: 'database',
+        },
+      },
+    ],
+    edges: [
+      { id: 'go-gateway-postgres', source: 'go-gateway', target: 'go-postgres' },
+      { id: 'go-gateway-redis', source: 'go-gateway', target: 'go-redis' },
+      { id: 'go-postgres-mongo', source: 'go-postgres', target: 'go-mongo' },
     ],
   },
 };

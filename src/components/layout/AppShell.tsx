@@ -171,21 +171,42 @@ function LeftRail() {
 }
 
 function AppMenu() {
+  const { data: apps, isError, isLoading } = useApps();
+  const selectedAppId = useAppStore((state) => state.selectedAppId);
+  const setSelectedAppId = useAppStore((state) => state.setSelectedAppId);
   const rows = [
-    { name: 'supertokens-golang', icon: Zap, color: 'bg-[#6657f4]' },
-    { name: 'supertokens-java', icon: Settings, color: 'bg-[#8b5cf6]' },
-    { name: 'supertokens-python', icon: RefreshCw, color: 'bg-[#ef4444]' },
-    { name: 'supertokens-ruby', icon: Box, color: 'bg-[#d946ef]' },
-    { name: 'supertokens-go', icon: Network, color: 'bg-[#8b5cf6]' },
+    { id: 'commerce', name: 'supertokens-golang', icon: Zap, color: 'bg-[#6657f4]' },
+    { id: 'ops', name: 'supertokens-java', icon: Settings, color: 'bg-[#8b5cf6]' },
+    { id: 'analytics', name: 'supertokens-python', icon: RefreshCw, color: 'bg-[#ef4444]' },
+    { id: 'ruby', name: 'supertokens-ruby', icon: Box, color: 'bg-[#d946ef]' },
+    { id: 'go', name: 'supertokens-go', icon: Network, color: 'bg-[#8b5cf6]' },
   ];
+  const availableIds = new Set((apps ?? []).map((app) => app.id));
+
+  if (isLoading) {
+    return <div className="text-sm text-zinc-500">Loading apps...</div>;
+  }
+
+  if (isError) {
+    return <div className="text-sm text-red-400">Could not load apps.</div>;
+  }
 
   return (
     <div className="space-y-2">
-      {rows.map(({ name, icon: Icon, color }) => (
+      {rows.map(({ id, name, icon: Icon, color }) => {
+        const isAvailable = availableIds.has(id);
+        const isSelected = selectedAppId === id;
+
+        return (
         <button
-          className="flex h-9 w-full items-center gap-3 rounded-md text-left text-sm font-semibold text-zinc-100 hover:bg-white/5"
+          className={cn(
+            'flex h-9 w-full items-center gap-3 rounded-md text-left text-sm font-semibold text-zinc-100 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-45',
+            isSelected && 'bg-white/5'
+          )}
           key={name}
           type="button"
+          disabled={!isAvailable}
+          onClick={() => setSelectedAppId(id)}
         >
           <span
             className={cn(
@@ -198,7 +219,8 @@ function AppMenu() {
           <span className="flex-1">{name}</span>
           <span className="text-xl font-light text-zinc-300">›</span>
         </button>
-      ))}
+        );
+      })}
     </div>
   );
 }

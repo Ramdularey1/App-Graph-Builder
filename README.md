@@ -34,6 +34,47 @@ npm run build
 - Mock error toggle and refetch action for loading/error/cached query states.
 - Bonus: add-node and fit-view controls.
 
+## How It Works
+
+### App switching
+
+- Use the application list to switch between `supertokens-golang`, `supertokens-java`, `supertokens-python`, `supertokens-ruby`, and `supertokens-go`.
+- Changing the selected app updates Zustand state and causes TanStack Query to fetch `/apps/:appId/graph`.
+- Each app has its own mocked graph data with nodes and edges.
+
+### Connecting nodes
+
+- Click `Add node` to create a new service node.
+- Each node has two visible connection handles:
+  - Blue dot on the right side: outgoing/source handle.
+  - Green dot on the left side: incoming/target handle.
+- Drag from a blue dot on one node to a green dot on another node to create a connection.
+- ReactFlow calls `onConnect`, and the app adds the new edge with `addEdge`.
+
+### Selecting and deleting nodes
+
+- Click a node to select it.
+- The selected node opens the inspector drawer/panel.
+- Delete a selected node in either way:
+  - Press `Delete` or `Backspace`.
+  - Click `Delete selected node` in the inspector.
+- Deleting a node also removes any edges connected to that node.
+
+### Editing node data
+
+- Select a node to open the Service Node inspector.
+- In `Config`, edit the node name and description.
+- In `Runtime`, change the traffic value with either the slider or numeric input.
+- Slider and numeric input stay synced and write changes back to the selected ReactFlow node data.
+
+### Mock API and error state
+
+- `/apps` returns the application list.
+- `/apps/:appId/graph` returns the graph for the selected app.
+- Mock calls use simulated latency.
+- Use the mock error toggle in the top bar to verify loading/error UI.
+- Use the refetch action to invalidate TanStack Query cache and reload data.
+
 ## Known Limitations
 
 - Mock API data is in-memory only; inspector edits persist in the current ReactFlow state but are not saved back to the mock API.

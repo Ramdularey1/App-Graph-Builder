@@ -11,7 +11,7 @@ import {
   type NodeTypes,
   type OnSelectionChangeParams,
 } from '@xyflow/react';
-import { Maximize2, Plus } from 'lucide-react';
+import { Maximize2, Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { AppGraph, ServiceNode } from '../../types/graph';
 import { useAppGraph } from '../../hooks/useAppGraph';
@@ -78,6 +78,43 @@ export function GraphCanvas() {
     [setNodes]
   );
 
+  const deleteSelectedNode = useCallback(() => {
+    if (!selectedNodeId) {
+      return;
+    }
+
+    setNodes((items) => items.filter((node) => node.id !== selectedNodeId));
+    setEdges((items) =>
+      items.filter(
+        (edge) =>
+          edge.source !== selectedNodeId && edge.target !== selectedNodeId
+      )
+    );
+    setSelectedNodeId(null);
+  }, [selectedNodeId, setEdges, setNodes, setSelectedNodeId]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isTyping =
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.isContentEditable;
+
+      if (isTyping || !selectedNodeId) {
+        return;
+      }
+
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        event.preventDefault();
+        deleteSelectedNode();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [deleteSelectedNode, selectedNodeId]);
+
   const addServiceNode = () => {
     const id = `service-${nodes.length + 1}`;
     const nextNode: ServiceNode = {
@@ -118,6 +155,17 @@ export function GraphCanvas() {
             <Plus className="h-4 w-4" />
             Add node
           </Button>
+          {selectedNode ? (
+            <Button
+              className="border-red-500/40 bg-red-950/80 text-red-100 hover:bg-red-900/80"
+              size="sm"
+              variant="outline"
+              onClick={deleteSelectedNode}
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete selected
+            </Button>
+          ) : null}
           <Button
             className="border-[#2f2f2f] bg-black/90 text-white hover:bg-[#171717]"
             size="sm"
@@ -180,21 +228,24 @@ export function GraphCanvas() {
 
       <div
         className={[
-          'fixed inset-0 z-40 bg-slate-950/40 opacity-0 pointer-events-none transition-opacity lg:hidden',
-          isMobilePanelOpen ? 'pointer-events-auto opacity-100' : '',
+          'fixed inset-0 z-40 bg-slate-950/40 transition-opacity lg:hidden',
+          isMobilePanelOpen
+            ? 'pointer-events-auto opacity-100'
+            : 'pointer-events-none opacity-0',
         ].join(' ')}
         onClick={() => setMobilePanelOpen(false)}
       />
       <aside
         className={[
-          'fixed right-0 top-0 z-50 h-full w-[min(92vw,380px)] translate-x-full border-l border-[#2b2b2b] bg-black text-white shadow-2xl transition-transform',
-          isMobilePanelOpen ? 'translate-x-0' : '',
+          'fixed right-0 top-0 z-50 h-full w-[min(92vw,380px)] border-l border-[#2b2b2b] bg-black text-white shadow-2xl transition-transform',
+          isMobilePanelOpen ? 'translate-x-0' : 'translate-x-full',
         ].join(' ')}
       >
         <RightPanel
           isDrawer
           selectedNode={selectedNode}
           onUpdateNode={updateNodeData}
+          onDeleteNode={deleteSelectedNode}
         />
       </aside>
     </section>

@@ -1,6 +1,8 @@
+import { Trash2 } from 'lucide-react';
 import type { ServiceNode } from '../../types/graph';
 import { useAppStore } from '../../store/useAppStore';
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Slider } from '../ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
@@ -9,6 +11,7 @@ import { Textarea } from '../ui/textarea';
 type NodeInspectorProps = {
   node?: ServiceNode | null;
   onUpdateNode?: (nodeId: string, data: Partial<ServiceNode['data']>) => void;
+  onDeleteNode?: () => void;
 };
 
 const statusVariant = {
@@ -17,7 +20,11 @@ const statusVariant = {
   Down: 'down',
 } as const;
 
-export function NodeInspector({ node, onUpdateNode }: NodeInspectorProps) {
+export function NodeInspector({
+  node,
+  onUpdateNode,
+  onDeleteNode,
+}: NodeInspectorProps) {
   const activeInspectorTab = useAppStore((state) => state.activeInspectorTab);
   const setActiveInspectorTab = useAppStore(
     (state) => state.setActiveInspectorTab
@@ -121,6 +128,15 @@ export function NodeInspector({ node, onUpdateNode }: NodeInspectorProps) {
           </div>
         </TabsContent>
       </Tabs>
+
+      <Button
+        className="mt-5 w-full border-red-500/40 bg-red-950/60 text-red-100 hover:bg-red-900/70"
+        variant="outline"
+        onClick={onDeleteNode}
+      >
+        <Trash2 className="h-4 w-4" />
+        Delete selected node
+      </Button>
     </section>
   );
 }

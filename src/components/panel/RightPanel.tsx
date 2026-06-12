@@ -11,12 +11,14 @@ type RightPanelProps = {
   isDrawer?: boolean;
   selectedNode?: ServiceNode | null;
   onUpdateNode?: (nodeId: string, data: Partial<ServiceNode['data']>) => void;
+  onDeleteNode?: () => void;
 };
 
 export function RightPanel({
   isDrawer = false,
   selectedNode,
   onUpdateNode,
+  onDeleteNode,
 }: RightPanelProps) {
   const appsQuery = useApps();
   const setMobilePanelOpen = useAppStore((state) => state.setMobilePanelOpen);
@@ -56,7 +58,11 @@ export function RightPanel({
         )}
 
         <div className="mt-6 border-t border-border pt-6">
-          <NodeInspector node={selectedNode} onUpdateNode={onUpdateNode} />
+          <NodeInspector
+            node={selectedNode}
+            onUpdateNode={onUpdateNode}
+            onDeleteNode={onDeleteNode}
+          />
         </div>
       </div>
     </div>
