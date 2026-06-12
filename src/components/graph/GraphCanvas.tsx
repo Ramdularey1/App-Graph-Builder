@@ -290,7 +290,7 @@ export function GraphCanvas() {
 
       <div
         className={[
-          'fixed inset-0 z-40 bg-slate-950/40 transition-opacity lg:hidden',
+          'fixed inset-0 z-40 bg-slate-950/40 transition-opacity',
           isMobilePanelOpen
             ? 'pointer-events-auto opacity-100'
             : 'pointer-events-none opacity-0',

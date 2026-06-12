@@ -59,3 +59,21 @@ textarea {
 .react-flow__attribution {
   display: none;
 }
+
+.app-slider {
+  scrollbar-color: #52525b transparent;
+  scrollbar-width: thin;
+}
+
+.app-slider::-webkit-scrollbar {
+  width: 6px;
+}
+
+.app-slider::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-slider::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 999px;
+}

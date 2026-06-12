@@ -1,6 +1,9 @@
 import type { AppGraph, AppSummary } from '../types/graph';
 
-const apps: AppSummary[] = [
+const CREATED_APPS_STORAGE_KEY = 'app-graph-builder:created-apps';
+const CREATED_GRAPHS_STORAGE_KEY = 'app-graph-builder:created-app-graphs';
+
+const defaultApps: AppSummary[] = [
   {
     id: 'commerce',
     name: 'supertokens-golang',
@@ -33,7 +36,7 @@ const apps: AppSummary[] = [
   },
 ];
 
-const graphs: Record<string, AppGraph> = {
+const defaultGraphs: Record<string, AppGraph> = {
   commerce: {
     nodes: [
       {
@@ -304,6 +307,45 @@ const cloneGraph = (graph: AppGraph): AppGraph => ({
   edges: graph.edges.map((edge) => ({ ...edge })),
 });
 
+const readCreatedApps = (): AppSummary[] => {
+  try {
+    const saved = window.localStorage.getItem(CREATED_APPS_STORAGE_KEY);
+    return saved ? (JSON.parse(saved) as AppSummary[]) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveCreatedApps = (apps: AppSummary[]) => {
+  window.localStorage.setItem(CREATED_APPS_STORAGE_KEY, JSON.stringify(apps));
+};
+
+const readCreatedGraphs = (): Record<string, AppGraph> => {
+  try {
+    const saved = window.localStorage.getItem(CREATED_GRAPHS_STORAGE_KEY);
+    return saved ? (JSON.parse(saved) as Record<string, AppGraph>) : {};
+  } catch {
+    return {};
+  }
+};
+
+const saveCreatedGraphs = (graphs: Record<string, AppGraph>) => {
+  window.localStorage.setItem(
+    CREATED_GRAPHS_STORAGE_KEY,
+    JSON.stringify(graphs)
+  );
+};
+
+const getAllApps = () => [...defaultApps, ...readCreatedApps()];
+
+const getAllGraphs = () => ({
+  ...defaultGraphs,
+  ...readCreatedGraphs(),
+});
+
+export const isDefaultApp = (appId: string) =>
+  defaultApps.some((app) => app.id === appId);
+
 const wait = (ms: number) =>
   new Promise((resolve) => {
     window.setTimeout(resolve, ms);
@@ -315,7 +357,7 @@ export async function getApps(shouldFail = false): Promise<AppSummary[]> {
     throw new Error('Mock API error while loading apps.');
   }
 
-  return apps;
+  return getAllApps();
 }
 
 export async function getAppGraph(
@@ -327,10 +369,48 @@ export async function getAppGraph(
     throw new Error('Mock API error while loading the graph.');
   }
 
-  const graph = graphs[appId];
+  const graph = getAllGraphs()[appId];
   if (!graph) {
     throw new Error(`No mock graph found for app "${appId}".`);
   }
 
   return cloneGraph(graph);
+}
+
+export async function createApp(name: string): Promise<AppSummary> {
+  await wait(400);
+  const newApp: AppSummary = {
+    id: `app-${Date.now()}`,
+    name,
+    environment: 'Development',
+    owner: 'You',
+  };
+  const createdApps = readCreatedApps();
+  const createdGraphs = readCreatedGraphs();
+
+  saveCreatedApps([...createdApps, newApp]);
+  saveCreatedGraphs({
+    ...createdGraphs,
+    [newApp.id]: { nodes: [], edges: [] },
+  });
+
+  return newApp;
+}
+
+export async function deleteApp(appId: string): Promise<string> {
+  await wait(300);
+
+  if (isDefaultApp(appId)) {
+    throw new Error('Default applications cannot be deleted.');
+  }
+
+  const createdApps = readCreatedApps().filter((app) => app.id !== appId);
+  const createdGraphs = readCreatedGraphs();
+
+  delete createdGraphs[appId];
+  window.localStorage.removeItem(`app-graph-builder:graph:${appId}`);
+  saveCreatedApps(createdApps);
+  saveCreatedGraphs(createdGraphs);
+
+  return appId;
 }
