@@ -4,20 +4,16 @@ import {
   Database,
   GitBranch,
   Leaf,
+  LogOut,
   Menu,
-  Moon,
-  MoreHorizontal,
   Network,
   PanelRightOpen,
   RefreshCw,
   Search,
   Settings,
-  Share2,
-  Sun,
   Zap,
 } from 'lucide-react';
 import { useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { GraphCanvas } from '../graph/GraphCanvas';
 import { Button } from '../ui/button';
 import { useApps } from '../../hooks/useApps';
@@ -25,13 +21,12 @@ import { useAppStore } from '../../store/useAppStore';
 import { cn } from '../../lib/utils';
 
 export function AppShell() {
-  const queryClient = useQueryClient();
   const { data: apps } = useApps();
   const selectedAppId = useAppStore((state) => state.selectedAppId);
-  const simulateApiError = useAppStore((state) => state.simulateApiError);
   const setSelectedAppId = useAppStore((state) => state.setSelectedAppId);
   const setMobilePanelOpen = useAppStore((state) => state.setMobilePanelOpen);
-  const setSimulateApiError = useAppStore((state) => state.setSimulateApiError);
+  const logout = useAppStore((state) => state.logout);
+  const currentUser = useAppStore((state) => state.currentUser);
 
   useEffect(() => {
     if (
@@ -57,49 +52,29 @@ export function AppShell() {
             <span className="truncate">supertokens-golang</span>
             <div className="flex items-center gap-3 text-zinc-300">
               <ChevronDown className="h-4 w-4" />
-              <MoreHorizontal className="h-4 w-4" />
             </div>
           </div>
         </div>
 
         <div className="pointer-events-auto flex items-start gap-2">
-          <Button
-            className="h-10 w-10 border-[#303030] bg-[#181818] text-zinc-200 hover:bg-[#242424]"
-            size="icon"
-            variant="outline"
-            onClick={() => queryClient.invalidateQueries()}
-            aria-label="Refetch"
-          >
-            <Share2 className="h-4 w-4" />
-          </Button>
-          <div className="flex h-10 overflow-hidden rounded-md border border-[#303030] bg-[#181818]">
-            <Button
-              className="h-10 w-10 rounded-none border-0 bg-[#303030] text-white hover:bg-[#3a3a3a]"
-              size="icon"
-              variant="ghost"
-              onClick={() => setSimulateApiError(!simulateApiError)}
-              aria-label="Toggle mock error"
-            >
-              <Moon className="h-4 w-4" />
-            </Button>
-            <Button
-              className="h-10 w-10 rounded-none border-0 bg-transparent text-zinc-500 hover:bg-[#242424]"
-              size="icon"
-              variant="ghost"
-              onClick={() => queryClient.invalidateQueries()}
-              aria-label="Refresh data"
-            >
-              <Sun className="h-4 w-4" />
-            </Button>
+          <div className="flex items-center gap-3 rounded-md border border-[#303030] bg-[#1a1a1a] px-3 py-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#2563eb] text-xs font-medium text-white">
+              {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
+            </div>
+            <span className="hidden text-sm font-medium text-zinc-200 sm:inline-block">
+              {currentUser?.name || 'User'}
+            </span>
           </div>
+
           <Button
-            className="h-16 w-16 rounded-2xl border-[#3a3a3a] bg-[#1d1d1d] text-zinc-300 hover:bg-[#252525]"
+            className="h-10 w-10 border-[#303030] bg-[#181818] text-zinc-300 hover:bg-[#242424]"
             size="icon"
             variant="outline"
-            onClick={() => setMobilePanelOpen(true)}
-            aria-label="Open inspector"
+            onClick={logout}
+            aria-label="Logout"
+            title="Logout"
           >
-            <MoreHorizontal className="h-5 w-5" />
+            <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </header>

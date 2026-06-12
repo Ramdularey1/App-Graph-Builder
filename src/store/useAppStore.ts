@@ -11,12 +11,16 @@ export type AddNodeRequest = {
 };
 
 type AppUiState = {
+  isAuthenticated: boolean;
+  currentUser: { name: string; email: string } | null;
   selectedAppId: string | null;
   selectedNodeId: string | null;
   isMobilePanelOpen: boolean;
   activeInspectorTab: InspectorTab;
   simulateApiError: boolean;
   addNodeRequest: AddNodeRequest | null;
+  login: (user: { name: string; email: string }) => void;
+  logout: () => void;
   setSelectedAppId: (appId: string) => void;
   setSelectedNodeId: (nodeId: string | null) => void;
   setMobilePanelOpen: (isOpen: boolean) => void;
@@ -26,6 +30,16 @@ type AppUiState = {
 };
 
 const SELECTED_APP_STORAGE_KEY = 'app-graph-builder:selected-app-id';
+const CURRENT_USER_STORAGE_KEY = 'app-graph-builder:current-user';
+
+const getInitialUser = () => {
+  try {
+    const saved = window.localStorage.getItem(CURRENT_USER_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+};
 
 const getInitialSelectedAppId = () => {
   try {
@@ -40,12 +54,29 @@ const persistSelectedAppId = (appId: string) => {
 };
 
 export const useAppStore = create<AppUiState>((set) => ({
+  isAuthenticated: !!getInitialUser(),
+  currentUser: getInitialUser(),
   selectedAppId: getInitialSelectedAppId(),
   selectedNodeId: null,
   isMobilePanelOpen: false,
   activeInspectorTab: 'config',
   simulateApiError: false,
   addNodeRequest: null,
+  login: (user) =>
+    set(() => {
+      window.localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(user));
+      return { isAuthenticated: true, currentUser: user };
+    }),
+  logout: () =>
+    set(() => {
+      window.localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
+      return {
+        isAuthenticated: false,
+        currentUser: null,
+        selectedNodeId: null,
+        isMobilePanelOpen: false,
+      };
+    }),
   setSelectedAppId: (appId) =>
     set(() => {
       persistSelectedAppId(appId);

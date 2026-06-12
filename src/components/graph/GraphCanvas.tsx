@@ -43,7 +43,8 @@ export function GraphCanvas() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const flowWrapperRef = useRef<HTMLDivElement>(null);
   const handledAddRequestIdRef = useRef<number | null>(null);
-  const hasLoadedGraphRef = useRef(false);
+  const loadedGraphAppIdRef = useRef<string | null>(null);
+  const skipNextSaveRef = useRef(false);
 
   useEffect(() => {
     if (graphQuery.data && selectedAppId) {
@@ -58,16 +59,26 @@ export function GraphCanvas() {
       }
 
       setSelectedNodeId(null);
-      hasLoadedGraphRef.current = true;
+      loadedGraphAppIdRef.current = selectedAppId;
+      skipNextSaveRef.current = true;
     }
   }, [graphQuery.data, selectedAppId, setEdges, setNodes, setSelectedNodeId]);
 
   useEffect(() => {
-    hasLoadedGraphRef.current = false;
+    loadedGraphAppIdRef.current = null;
   }, [selectedAppId]);
 
   useEffect(() => {
-    if (!selectedAppId || !hasLoadedGraphRef.current) {
+    if (
+      !selectedAppId ||
+      loadedGraphAppIdRef.current !== selectedAppId ||
+      !nodes.length
+    ) {
+      return;
+    }
+
+    if (skipNextSaveRef.current) {
+      skipNextSaveRef.current = false;
       return;
     }
 
@@ -314,7 +325,10 @@ function CenterViewportBridge({
   const centeredGraphKey = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!nodes.length || centeredGraphKey.current === graphKey) {
+    if (
+      !nodes.length ||
+      centeredGraphKey.current === graphKey
+    ) {
       return;
     }
 
