@@ -24,6 +24,11 @@ import { ServiceNodeCard } from './ServiceNodeCard';
 const nodeTypes: NodeTypes = {
   service: ServiceNodeCard,
 };
+const MIN_ZOOM = 0.35;
+const NODE_CARD_WIDTH = 360;
+const NODE_CARD_HEIGHT = 230;
+const NODE_COLUMN_GAP = 460;
+const NODE_ROW_GAP = 300;
 
 export function GraphCanvas() {
   const selectedAppId = useAppStore((state) => state.selectedAppId);
@@ -38,7 +43,7 @@ export function GraphCanvas() {
 
   useEffect(() => {
     if (graphQuery.data) {
-      setNodes(graphQuery.data.nodes);
+      setNodes(arrangeNodes(graphQuery.data.nodes));
       setEdges(graphQuery.data.edges);
       setSelectedNodeId(null);
     }
@@ -117,10 +122,15 @@ export function GraphCanvas() {
 
   const addServiceNode = () => {
     const id = `service-${nodes.length + 1}`;
+    const row = Math.floor(nodes.length / 2);
+    const column = nodes.length % 2;
     const nextNode: ServiceNode = {
       id,
       type: 'service',
-      position: { x: 160 + nodes.length * 32, y: 260 + nodes.length * 18 },
+      position: {
+        x: column * NODE_COLUMN_GAP,
+        y: (row + 1) * NODE_ROW_GAP,
+      },
       data: {
         label: 'New Service',
         description: 'New service node.',
@@ -207,13 +217,17 @@ export function GraphCanvas() {
               onConnect={onConnect}
               onSelectionChange={onSelectionChange}
               onNodesDelete={() => setSelectedNodeId(null)}
-              defaultViewport={{ x: 10, y: 40, zoom: 0.35 }}
-              minZoom={0.35}
+              defaultViewport={{ x: 0, y: 0, zoom: MIN_ZOOM }}
+              minZoom={MIN_ZOOM}
               maxZoom={1.5}
               deleteKeyCode={['Backspace', 'Delete']}
               proOptions={{ hideAttribution: true }}
               className="dark-canvas-flow"
             >
+              <CenterViewportBridge
+                graphKey={`${selectedAppId}:${nodes.map((node) => node.id).join(',')}`}
+                nodes={nodes}
+              />
               <FitViewBridge />
               <Background
                 color="#2c2c2c"
@@ -253,6 +267,54 @@ export function GraphCanvas() {
   );
 }
 
+function CenterViewportBridge({
+  graphKey,
+  nodes,
+}: {
+  graphKey: string;
+  nodes: ServiceNode[];
+}) {
+  const { setViewport } = useReactFlow();
+  const centeredGraphKey = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!nodes.length || centeredGraphKey.current === graphKey) {
+      return;
+    }
+
+    centeredGraphKey.current = graphKey;
+
+    window.requestAnimationFrame(() => {
+      const container = document
+        .querySelector('.dark-canvas-flow')
+        ?.getBoundingClientRect();
+
+      if (!container) {
+        return;
+      }
+
+      const minX = Math.min(...nodes.map((node) => node.position.x));
+      const minY = Math.min(...nodes.map((node) => node.position.y));
+      const maxX = Math.max(
+        ...nodes.map((node) => node.position.x + NODE_CARD_WIDTH)
+      );
+      const maxY = Math.max(
+        ...nodes.map((node) => node.position.y + NODE_CARD_HEIGHT)
+      );
+
+      const graphWidth = maxX - minX;
+      const graphHeight = maxY - minY;
+      const x = (container.width - graphWidth * MIN_ZOOM) / 2 - minX * MIN_ZOOM;
+      const y =
+        (container.height - graphHeight * MIN_ZOOM) / 2 - minY * MIN_ZOOM;
+
+      void setViewport({ x, y, zoom: MIN_ZOOM }, { duration: 0 });
+    });
+  }, [graphKey, nodes, setViewport]);
+
+  return null;
+}
+
 function FitViewBridge() {
   const { fitView } = useReactFlow();
 
@@ -265,4 +327,19 @@ function FitViewBridge() {
   }, [fitView]);
 
   return null;
+}
+
+function arrangeNodes(nodes: ServiceNode[]) {
+  return nodes.map((node, index) => {
+    const row = Math.floor(index / 2);
+    const column = index % 2;
+
+    return {
+      ...node,
+      position: {
+        x: column * NODE_COLUMN_GAP,
+        y: row * NODE_ROW_GAP,
+      },
+    };
+  });
 }
