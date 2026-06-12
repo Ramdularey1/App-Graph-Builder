@@ -115,12 +115,12 @@ export function LoginPage() {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#0f0f10] text-white">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#0f0f10] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.11)_1px,transparent_1.5px)] [background-size:18px_18px]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(180deg,rgba(37,99,235,0.20),transparent)]" />
 
       <section className="relative z-10 grid min-h-screen grid-cols-1 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="flex min-h-[42vh] flex-col justify-between p-6 sm:p-10 lg:min-h-screen">
+        <div className="flex min-h-[36vh] flex-col justify-between p-5 sm:p-10 lg:min-h-screen">
           <div className="flex h-12 w-fit items-center overflow-hidden rounded-md border border-[#333] bg-[#151515] shadow-2xl">
             <div className="grid h-12 w-14 place-items-center border-r border-[#2a2a2a] bg-black">
               <div className="h-8 w-8 rounded-sm border-4 border-white border-r-transparent border-t-transparent" />
@@ -131,12 +131,12 @@ export function LoginPage() {
             <div className="px-4 text-sm font-semibold">App Graph Builder</div>
           </div>
 
-          <div className="max-w-2xl py-12 lg:py-0">
+          <div className="max-w-2xl py-8 sm:py-12 lg:py-0">
             <Badge className="mb-6 border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
               <ShieldCheck className="mr-1 h-3.5 w-3.5" />
               Secure workspace
             </Badge>
-            <h1 className="text-4xl font-semibold leading-tight tracking-normal sm:text-5xl lg:text-6xl">
+            <h1 className="text-3xl font-semibold leading-tight tracking-normal sm:text-5xl lg:text-6xl">
               Build service topology with confidence.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-zinc-400">
@@ -153,7 +153,7 @@ export function LoginPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-center px-6 pb-10 sm:px-10 lg:pb-0">
+        <div className="flex items-center justify-center px-5 pb-10 sm:px-10 lg:pb-0">
           <div className="w-full max-w-md rounded-lg border border-[#2d2d2d] bg-black/88 p-6 shadow-2xl backdrop-blur sm:p-8">
             <div className="mb-8">
               <div className="mb-2 text-2xl font-semibold">

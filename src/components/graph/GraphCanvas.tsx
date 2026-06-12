@@ -202,7 +202,7 @@ export function GraphCanvas() {
   return (
     <section className="relative min-h-screen bg-transparent">
       <div className="relative min-w-0">
-        <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 flex-wrap gap-2">
+        <div className="absolute bottom-20 left-1/2 z-10 flex w-[calc(100vw-1.5rem)] -translate-x-1/2 flex-wrap justify-center gap-2 sm:bottom-5 sm:w-auto">
           <Button
             className="border-[#2f2f2f] bg-black/90 text-white hover:bg-[#171717]"
             size="sm"
@@ -253,7 +253,7 @@ export function GraphCanvas() {
         ) : (
           <div
             ref={flowWrapperRef}
-            className="h-screen min-h-[720px]"
+            className="h-[100dvh] min-h-[640px] sm:min-h-[720px]"
           >
             <ReactFlow<AppGraph['nodes'][number]>
               nodes={nodes}
@@ -299,7 +299,7 @@ export function GraphCanvas() {
       />
       <aside
         className={[
-          'fixed right-0 top-0 z-50 h-full w-[min(92vw,380px)] border-l border-[#2b2b2b] bg-black text-white shadow-2xl transition-transform',
+          'fixed right-0 top-0 z-50 h-full w-[min(94vw,380px)] border-l border-[#2b2b2b] bg-black text-white shadow-2xl transition-transform sm:w-[min(92vw,380px)]',
           isMobilePanelOpen ? 'translate-x-0' : 'translate-x-full',
         ].join(' ')}
       >

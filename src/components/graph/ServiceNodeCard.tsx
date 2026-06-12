@@ -19,7 +19,7 @@ export function ServiceNodeCard({ data, selected }: NodeProps<ServiceNode>) {
   return (
     <div
       className={cn(
-        'w-[360px] rounded-lg border border-[#111] bg-black p-5 text-white shadow-[0_12px_30px_rgba(0,0,0,0.45)] transition-shadow sm:w-[360px]',
+        'w-[300px] rounded-lg border border-[#111] bg-black p-4 text-white shadow-[0_12px_30px_rgba(0,0,0,0.45)] transition-shadow sm:w-[360px] sm:p-5',
         selected && 'border-[#2563eb] shadow-[0_0_0_1px_rgba(37,99,235,0.6),0_16px_36px_rgba(0,0,0,0.5)]'
       )}
     >
@@ -28,14 +28,14 @@ export function ServiceNodeCard({ data, selected }: NodeProps<ServiceNode>) {
         position={Position.Left}
         type="target"
       />
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-5 flex items-center justify-between gap-3 sm:mb-6 sm:gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <div className="grid h-7 w-7 place-items-center rounded-md bg-white text-slate-900">
             <Icon className="h-4 w-4" />
           </div>
-          <div className="truncate text-base font-semibold">{data.label}</div>
+          <div className="truncate text-sm font-semibold sm:text-base">{data.label}</div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <span className="rounded-md border border-emerald-500/70 bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-400">
             $0.03/HR
           </span>
@@ -56,21 +56,21 @@ export function ServiceNodeCard({ data, selected }: NodeProps<ServiceNode>) {
         <span>1</span>
       </div>
 
-      <div className="mb-4 grid grid-cols-4 overflow-hidden rounded-md bg-[#111a2e] text-xs font-semibold text-slate-300">
+      <div className="mb-4 grid grid-cols-4 overflow-hidden rounded-md bg-[#111a2e] text-[10px] font-semibold text-slate-300 sm:text-xs">
         <div className="flex h-8 items-center justify-center gap-1 rounded-md bg-white text-slate-950">
           <Cpu className="h-3.5 w-3.5" />
           CPU
         </div>
         <div className="flex h-8 items-center justify-center gap-1">
-          <MemoryStick className="h-3.5 w-3.5" />
+          <MemoryStick className="hidden h-3.5 w-3.5 sm:block" />
           Memory
         </div>
         <div className="flex h-8 items-center justify-center gap-1">
-          <HardDrive className="h-3.5 w-3.5" />
+          <HardDrive className="hidden h-3.5 w-3.5 sm:block" />
           Disk
         </div>
         <div className="flex h-8 items-center justify-center gap-1">
-          <Database className="h-3.5 w-3.5" />
+          <Database className="hidden h-3.5 w-3.5 sm:block" />
           Region
         </div>
       </div>
@@ -82,7 +82,7 @@ export function ServiceNodeCard({ data, selected }: NodeProps<ServiceNode>) {
             style={{ left: `calc(${data.traffic}% - 7px)` }}
           />
         </div>
-        <div className="grid h-8 w-20 place-items-center rounded-md border border-[#171717] bg-black text-sm text-zinc-200">
+        <div className="grid h-8 w-16 place-items-center rounded-md border border-[#171717] bg-black text-sm text-zinc-200 sm:w-20">
           0.02
         </div>
       </div>

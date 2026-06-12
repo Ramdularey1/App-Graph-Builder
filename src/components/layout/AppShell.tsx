@@ -62,8 +62,8 @@ export function AppShell() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#111111] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10)_1px,transparent_1.5px)] [background-size:18px_18px]" />
-      <header className="pointer-events-none fixed left-7 right-3 top-4 z-30 flex items-start justify-between">
-        <div className="pointer-events-auto flex h-10 w-[380px] max-w-[calc(100vw-2rem)] items-center overflow-hidden rounded-md border border-[#333] bg-[#151515] shadow-2xl">
+      <header className="pointer-events-none fixed left-3 right-3 top-3 z-30 flex flex-col gap-2 sm:left-5 sm:right-5 sm:top-4 sm:flex-row sm:items-start sm:justify-between lg:left-7 lg:right-3">
+        <div className="pointer-events-auto flex h-10 w-full max-w-[420px] items-center overflow-hidden rounded-md border border-[#333] bg-[#151515] shadow-2xl sm:w-[380px]">
           <div className="grid h-10 w-12 place-items-center border-r border-[#2a2a2a] bg-black">
             <div className="h-8 w-8 rounded-sm border-4 border-white border-r-transparent border-t-transparent" />
           </div>
@@ -78,7 +78,7 @@ export function AppShell() {
           </div>
         </div>
 
-        <div className="pointer-events-auto flex items-start gap-2">
+        <div className="pointer-events-auto flex items-start justify-end gap-2 sm:justify-start">
           <div className="flex items-center gap-3 rounded-md border border-[#303030] bg-[#1a1a1a] px-3 py-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#2563eb] text-xs font-medium text-white">
               {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
@@ -106,9 +106,9 @@ export function AppShell() {
         <main className="min-h-screen">
           <GraphCanvas />
         </main>
-        <div className="fixed left-[92px] top-[72px] z-20 h-[330px] w-[324px] overflow-hidden rounded-lg border border-[#141414] bg-black shadow-2xl">
-          <div className="flex h-full flex-col p-5">
-            <div className="mb-5 text-lg font-semibold">Application</div>
+        <div className="fixed left-3 right-3 top-[112px] z-20 h-[280px] overflow-hidden rounded-lg border border-[#141414] bg-black shadow-2xl sm:left-[76px] sm:right-auto sm:top-[72px] sm:h-[330px] sm:w-[324px] lg:left-[92px]">
+          <div className="flex h-full flex-col p-4 sm:p-5">
+            <div className="mb-4 text-base font-semibold sm:mb-5 sm:text-lg">Application</div>
             <div className="mb-3 flex gap-2">
               <div className="flex h-8 flex-1 items-center gap-2 rounded-md bg-[#1d2023] px-3 text-sm text-zinc-300">
                 <input
@@ -270,7 +270,7 @@ function LeftRail() {
   ];
 
   return (
-    <nav className="fixed left-5 top-[312px] z-30 flex w-11 flex-col items-center gap-2 rounded-lg bg-black p-2 shadow-2xl">
+    <nav className="fixed bottom-3 left-1/2 z-30 flex max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-2 overflow-x-auto rounded-lg bg-black p-2 shadow-2xl sm:left-5 sm:top-[312px] sm:w-11 sm:max-w-none sm:translate-x-0 sm:flex-col sm:overflow-visible">
       {items.map(({ icon: Icon, color, label, action }, index) => (
         <button
           className={cn(
