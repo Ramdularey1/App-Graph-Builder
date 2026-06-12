@@ -3,7 +3,6 @@ import {
   Background,
   BackgroundVariant,
   Controls,
-  MiniMap,
   ReactFlow,
   useReactFlow,
   useEdgesState,
@@ -107,14 +106,20 @@ export function GraphCanvas() {
   }
 
   return (
-    <section className="relative grid min-h-[calc(100vh-4rem)] grid-cols-1 bg-muted/20 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <section className="relative min-h-screen bg-transparent">
       <div className="relative min-w-0">
-        <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-2">
-          <Button size="sm" variant="outline" onClick={addServiceNode}>
+        <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 flex-wrap gap-2">
+          <Button
+            className="border-[#2f2f2f] bg-black/90 text-white hover:bg-[#171717]"
+            size="sm"
+            variant="outline"
+            onClick={addServiceNode}
+          >
             <Plus className="h-4 w-4" />
             Add node
           </Button>
           <Button
+            className="border-[#2f2f2f] bg-black/90 text-white hover:bg-[#171717]"
             size="sm"
             variant="outline"
             onClick={() => {
@@ -143,7 +148,7 @@ export function GraphCanvas() {
         ) : (
           <div
             ref={flowWrapperRef}
-            className="h-[calc(100vh-4rem)] min-h-[560px]"
+            className="h-screen min-h-[720px]"
           >
             <ReactFlow<AppGraph['nodes'][number]>
               nodes={nodes}
@@ -155,26 +160,23 @@ export function GraphCanvas() {
               onSelectionChange={onSelectionChange}
               onNodesDelete={() => setSelectedNodeId(null)}
               fitView
+              fitViewOptions={{ padding: 0.1 }}
               deleteKeyCode={['Backspace', 'Delete']}
               proOptions={{ hideAttribution: true }}
+              className="dark-canvas-flow"
             >
               <FitViewBridge />
               <Background
-                color="#94a3b8"
-                gap={22}
-                size={1.5}
+                color="#2c2c2c"
+                gap={18}
+                size={1.25}
                 variant={BackgroundVariant.Dots}
               />
-              <Controls />
-              <MiniMap pannable zoomable />
+            <Controls className="graph-controls" />
             </ReactFlow>
           </div>
         )}
       </div>
-
-      <aside className="hidden border-l border-border bg-background lg:block">
-        <RightPanel selectedNode={selectedNode} onUpdateNode={updateNodeData} />
-      </aside>
 
       <div
         className={[
@@ -185,7 +187,7 @@ export function GraphCanvas() {
       />
       <aside
         className={[
-          'fixed right-0 top-0 z-50 h-full w-[min(92vw,380px)] translate-x-full border-l border-border bg-background shadow-2xl transition-transform lg:hidden',
+          'fixed right-0 top-0 z-50 h-full w-[min(92vw,380px)] translate-x-full border-l border-[#2b2b2b] bg-black text-white shadow-2xl transition-transform',
           isMobilePanelOpen ? 'translate-x-0' : '',
         ].join(' ')}
       >

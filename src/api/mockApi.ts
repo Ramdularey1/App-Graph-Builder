@@ -3,19 +3,19 @@ import type { AppGraph, AppSummary } from '../types/graph';
 const apps: AppSummary[] = [
   {
     id: 'commerce',
-    name: 'Commerce Cloud',
+    name: 'supertokens-golang',
     environment: 'Production',
     owner: 'Growth',
   },
   {
     id: 'ops',
-    name: 'Ops Console',
+    name: 'supertokens-java',
     environment: 'Staging',
     owner: 'Platform',
   },
   {
     id: 'analytics',
-    name: 'Analytics Hub',
+    name: 'supertokens-python',
     environment: 'Sandbox',
     owner: 'Data',
   },
@@ -27,9 +27,9 @@ const graphs: Record<string, AppGraph> = {
       {
         id: 'gateway',
         type: 'service',
-        position: { x: 40, y: 110 },
+        position: { x: 420, y: 160 },
         data: {
-          label: 'API Gateway',
+          label: 'Node',
           description: 'Routes storefront and partner traffic.',
           status: 'Healthy',
           traffic: 76,
@@ -39,24 +39,36 @@ const graphs: Record<string, AppGraph> = {
       {
         id: 'checkout',
         type: 'service',
-        position: { x: 360, y: 80 },
+        position: { x: 785, y: 210 },
         data: {
-          label: 'Checkout Service',
+          label: 'Postgres',
           description: 'Owns payment intent and order submission.',
-          status: 'Degraded',
+          status: 'Healthy',
           traffic: 58,
-          kind: 'service',
+          kind: 'database',
         },
       },
       {
         id: 'orders-db',
         type: 'service',
-        position: { x: 680, y: 190 },
+        position: { x: 350, y: 480 },
         data: {
-          label: 'Orders DB',
+          label: 'Redis',
           description: 'Primary order storage cluster.',
-          status: 'Healthy',
+          status: 'Down',
           traffic: 44,
+          kind: 'database',
+        },
+      },
+      {
+        id: 'mongo-db',
+        type: 'service',
+        position: { x: 835, y: 530 },
+        data: {
+          label: 'Mongodb',
+          description: 'Document store for application metadata.',
+          status: 'Down',
+          traffic: 66,
           kind: 'database',
         },
       },
@@ -64,6 +76,7 @@ const graphs: Record<string, AppGraph> = {
     edges: [
       { id: 'gateway-checkout', source: 'gateway', target: 'checkout' },
       { id: 'checkout-orders', source: 'checkout', target: 'orders-db' },
+      { id: 'checkout-mongo', source: 'checkout', target: 'mongo-db' },
     ],
   },
   ops: {
