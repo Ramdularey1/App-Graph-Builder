@@ -15,7 +15,7 @@ import { Maximize2, Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { AppGraph, ServiceNode } from '../../types/graph';
 import { useAppGraph } from '../../hooks/useAppGraph';
-import { useAppStore } from '../../store/useAppStore';
+import { type AddNodeRequest, useAppStore } from '../../store/useAppStore';
 import { RightPanel } from '../panel/RightPanel';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
@@ -24,11 +24,12 @@ import { ServiceNodeCard } from './ServiceNodeCard';
 const nodeTypes: NodeTypes = {
   service: ServiceNodeCard,
 };
-const MIN_ZOOM = 0.35;
+const MIN_ZOOM = 0.55;
 const NODE_CARD_WIDTH = 360;
 const NODE_CARD_HEIGHT = 230;
 const NODE_COLUMN_GAP = 460;
 const NODE_ROW_GAP = 300;
+const STORAGE_PREFIX = 'app-graph-builder:graph:';
 
 export function GraphCanvas() {
   const selectedAppId = useAppStore((state) => state.selectedAppId);
@@ -36,18 +37,42 @@ export function GraphCanvas() {
   const isMobilePanelOpen = useAppStore((state) => state.isMobilePanelOpen);
   const setSelectedNodeId = useAppStore((state) => state.setSelectedNodeId);
   const setMobilePanelOpen = useAppStore((state) => state.setMobilePanelOpen);
+  const addNodeRequest = useAppStore((state) => state.addNodeRequest);
   const graphQuery = useAppGraph(selectedAppId);
   const [nodes, setNodes, onNodesChange] = useNodesState<ServiceNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const flowWrapperRef = useRef<HTMLDivElement>(null);
+  const handledAddRequestIdRef = useRef<number | null>(null);
+  const hasLoadedGraphRef = useRef(false);
 
   useEffect(() => {
-    if (graphQuery.data) {
-      setNodes(arrangeNodes(graphQuery.data.nodes));
-      setEdges(graphQuery.data.edges);
+    if (graphQuery.data && selectedAppId) {
+      const savedGraph = loadSavedGraph(selectedAppId);
+
+      if (savedGraph) {
+        setNodes(savedGraph.nodes);
+        setEdges(savedGraph.edges);
+      } else {
+        setNodes(arrangeNodes(graphQuery.data.nodes));
+        setEdges(graphQuery.data.edges);
+      }
+
       setSelectedNodeId(null);
+      hasLoadedGraphRef.current = true;
     }
-  }, [graphQuery.data, setEdges, setNodes, setSelectedNodeId]);
+  }, [graphQuery.data, selectedAppId, setEdges, setNodes, setSelectedNodeId]);
+
+  useEffect(() => {
+    hasLoadedGraphRef.current = false;
+  }, [selectedAppId]);
+
+  useEffect(() => {
+    if (!selectedAppId || !hasLoadedGraphRef.current) {
+      return;
+    }
+
+    saveGraph(selectedAppId, { nodes, edges });
+  }, [edges, nodes, selectedAppId]);
 
   const selectedNode = useMemo(
     () => nodes.find((node) => node.id === selectedNodeId) ?? null,
@@ -120,29 +145,40 @@ export function GraphCanvas() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [deleteSelectedNode, selectedNodeId]);
 
-  const addServiceNode = () => {
+  const addServiceNode = useCallback((template?: Omit<AddNodeRequest, 'id'>) => {
     const id = `service-${nodes.length + 1}`;
-    const row = Math.floor(nodes.length / 2);
-    const column = nodes.length % 2;
+    const visibleCenter = getVisibleFlowCenter(flowWrapperRef.current);
     const nextNode: ServiceNode = {
       id,
       type: 'service',
       position: {
-        x: column * NODE_COLUMN_GAP,
-        y: (row + 1) * NODE_ROW_GAP,
+        x: visibleCenter.x - NODE_CARD_WIDTH / 2,
+        y: visibleCenter.y - NODE_CARD_HEIGHT / 2,
       },
       data: {
-        label: 'New Service',
-        description: 'New service node.',
-        status: 'Healthy',
-        traffic: 50,
-        kind: 'service',
+        label: template?.label ?? 'New Service',
+        description: template?.description ?? 'New service node.',
+        status: template?.status ?? 'Healthy',
+        traffic: template?.traffic ?? 50,
+        kind: template?.kind ?? 'service',
       },
     };
 
     setNodes((items) => [...items, nextNode]);
     setSelectedNodeId(id);
-  };
+  }, [nodes.length, setNodes, setSelectedNodeId]);
+
+  useEffect(() => {
+    if (
+      !addNodeRequest ||
+      handledAddRequestIdRef.current === addNodeRequest.id
+    ) {
+      return;
+    }
+
+    handledAddRequestIdRef.current = addNodeRequest.id;
+    addServiceNode(addNodeRequest);
+  }, [addNodeRequest, addServiceNode]);
 
   if (!selectedAppId) {
     return (
@@ -225,7 +261,7 @@ export function GraphCanvas() {
               className="dark-canvas-flow"
             >
               <CenterViewportBridge
-                graphKey={`${selectedAppId}:${nodes.map((node) => node.id).join(',')}`}
+                graphKey={selectedAppId}
                 nodes={nodes}
               />
               <FitViewBridge />
@@ -329,6 +365,27 @@ function FitViewBridge() {
   return null;
 }
 
+function storageKey(appId: string) {
+  return `${STORAGE_PREFIX}${appId}`;
+}
+
+function loadSavedGraph(appId: string) {
+  try {
+    const saved = window.localStorage.getItem(storageKey(appId));
+    if (!saved) {
+      return null;
+    }
+
+    return JSON.parse(saved) as AppGraph;
+  } catch {
+    return null;
+  }
+}
+
+function saveGraph(appId: string, graph: AppGraph) {
+  window.localStorage.setItem(storageKey(appId), JSON.stringify(graph));
+}
+
 function arrangeNodes(nodes: ServiceNode[]) {
   return nodes.map((node, index) => {
     const row = Math.floor(index / 2);
@@ -342,4 +399,22 @@ function arrangeNodes(nodes: ServiceNode[]) {
       },
     };
   });
+}
+
+function getVisibleFlowCenter(wrapper: HTMLDivElement | null) {
+  if (!wrapper) {
+    return { x: NODE_CARD_WIDTH / 2, y: NODE_CARD_HEIGHT / 2 };
+  }
+
+  const wrapperRect = wrapper.getBoundingClientRect();
+  const viewport = wrapper.querySelector('.react-flow__viewport');
+  const transform = viewport ? window.getComputedStyle(viewport).transform : '';
+  const matrix = new DOMMatrixReadOnly(transform === 'none' ? undefined : transform);
+  const screenCenterX = wrapperRect.width / 2;
+  const screenCenterY = wrapperRect.height / 2;
+
+  return {
+    x: (screenCenterX - matrix.m41) / matrix.a,
+    y: (screenCenterY - matrix.m42) / matrix.d,
+  };
 }

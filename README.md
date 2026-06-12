@@ -66,6 +66,7 @@ npm run build
 - In `Config`, edit the node name and description.
 - In `Runtime`, change the traffic value with either the slider or numeric input.
 - Slider and numeric input stay synced and write changes back to the selected ReactFlow node data.
+- Created nodes, deleted nodes, moved nodes, new connections, and inspector edits are persisted per app in `localStorage`, so they survive browser refreshes.
 
 ### Mock API and error state
 
@@ -77,5 +78,5 @@ npm run build
 
 ## Known Limitations
 
-- Mock API data is in-memory only; inspector edits persist in the current ReactFlow state but are not saved back to the mock API.
+- Mock API data is still local/in-memory; user graph changes are persisted in browser `localStorage`, not sent to a backend.
 - The UI is aligned to the requested screenshot structure, but it is not intended to be pixel-perfect.

@@ -34,7 +34,10 @@ export function AppShell() {
   const setSimulateApiError = useAppStore((state) => state.setSimulateApiError);
 
   useEffect(() => {
-    if (!selectedAppId && apps?.[0]) {
+    if (
+      (!selectedAppId || !apps?.some((app) => app.id === selectedAppId)) &&
+      apps?.[0]
+    ) {
       setSelectedAppId(apps[0].id);
     }
   }, [apps, selectedAppId, setSelectedAppId]);
@@ -140,19 +143,91 @@ export function AppShell() {
 }
 
 function LeftRail() {
+  const setMobilePanelOpen = useAppStore((state) => state.setMobilePanelOpen);
+  const requestAddNode = useAppStore((state) => state.requestAddNode);
   const items = [
-    { icon: GitBranch, color: 'bg-[#0f172a]', label: 'GitHub' },
-    { icon: Database, color: 'bg-[#0f3450]', label: 'Postgres' },
-    { icon: Database, color: 'bg-[#d52222]', label: 'Redis' },
-    { icon: Leaf, color: 'bg-[#112915]', label: 'Mongo' },
-    { icon: Box, color: 'bg-[#111827]', label: 'Box' },
-    { icon: PanelRightOpen, color: 'bg-[#111827]', label: 'Panels' },
-    { icon: Network, color: 'bg-[#06251d]', label: 'Network' },
+    {
+      icon: GitBranch,
+      color: 'bg-[#0f172a]',
+      label: 'Add source service',
+      action: () =>
+        requestAddNode({
+          label: 'Source Service',
+          description: 'Source control backed service node.',
+          kind: 'service',
+          status: 'Healthy',
+          traffic: 50,
+        }),
+    },
+    {
+      icon: Database,
+      color: 'bg-[#0f3450]',
+      label: 'Add Postgres node',
+      action: () =>
+        requestAddNode({
+          label: 'Postgres',
+          description: 'Relational database node.',
+          kind: 'database',
+          status: 'Healthy',
+          traffic: 55,
+        }),
+    },
+    {
+      icon: Database,
+      color: 'bg-[#d52222]',
+      label: 'Add Redis node',
+      action: () =>
+        requestAddNode({
+          label: 'Redis',
+          description: 'Cache and queue storage node.',
+          kind: 'database',
+          status: 'Degraded',
+          traffic: 42,
+        }),
+    },
+    {
+      icon: Leaf,
+      color: 'bg-[#112915]',
+      label: 'Add MongoDB node',
+      action: () =>
+        requestAddNode({
+          label: 'Mongodb',
+          description: 'Document database node.',
+          kind: 'database',
+          status: 'Healthy',
+          traffic: 62,
+        }),
+    },
+    {
+      icon: Box,
+      color: 'bg-[#111827]',
+      label: 'Add container node',
+      action: () =>
+        requestAddNode({
+          label: 'Container',
+          description: 'Generic containerized service node.',
+          kind: 'service',
+          status: 'Healthy',
+          traffic: 48,
+        }),
+    },
+    {
+      icon: PanelRightOpen,
+      color: 'bg-[#111827]',
+      label: 'Open inspector',
+      action: () => setMobilePanelOpen(true),
+    },
+    {
+      icon: Network,
+      color: 'bg-[#06251d]',
+      label: 'Fit topology',
+      action: () => window.dispatchEvent(new Event('app-graph-fit-view')),
+    },
   ];
 
   return (
-    <nav className="fixed left-5 top-[310px] z-30 hidden w-11 flex-col items-center gap-2 rounded-lg bg-black p-2 shadow-2xl md:flex">
-      {items.map(({ icon: Icon, color, label }, index) => (
+    <nav className="fixed bottom-20 left-1/2 z-30 flex -translate-x-1/2 flex-row items-center gap-2 rounded-lg bg-black p-2 shadow-2xl lg:left-5 lg:top-[310px] lg:bottom-auto lg:w-11 lg:translate-x-0 lg:flex-col">
+      {items.map(({ icon: Icon, color, label, action }, index) => (
         <button
           className={cn(
             'flex h-8 w-8 items-center justify-center rounded-md text-white transition-transform hover:scale-105',
@@ -162,6 +237,8 @@ function LeftRail() {
           key={label}
           type="button"
           aria-label={label}
+          title={label}
+          onClick={action}
         >
           <Icon className="h-5 w-5" />
         </button>
