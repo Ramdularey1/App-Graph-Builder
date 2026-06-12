@@ -71,7 +71,7 @@ export function AppShell() {
             <Zap className="h-4 w-4 text-white" />
           </div>
           <div className="flex min-w-0 flex-1 items-center justify-between px-3 text-sm font-semibold">
-            <span className="truncate">supertokens-golang</span>
+            <span className="truncate">App Graph Builder</span>
             <div className="flex items-center gap-3 text-zinc-300">
               <ChevronDown className="h-4 w-4" />
             </div>
